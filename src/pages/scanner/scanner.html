@@ -6,7 +6,7 @@
 
 <ion-content padding>
 
-  <form [formGroup]="scanForm" (ngSubmit)="processScan()">
+  <form [formGroup]="scanForm" (ngSubmit)="processForm()">
   
     <ion-item>
       <ion-label>Shop</ion-label>
@@ -33,6 +33,14 @@
     <button type="submit" ion-button block [disabled]="!scanForm.valid">Submit</button>
 
   </form>
+
+  <br><hr><br>
+
+  <button ion-button (click)="scan()">Scan ... </button>
+  <div *ngIf="scanData">
+    <p>Scanned Text : {{ scanData.text }}</p>
+    <p>Scanned Format : {{ scanData.format }}</p>
+  </div>
   
   <br><hr><br>
 

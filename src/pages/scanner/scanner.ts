@@ -3,6 +3,7 @@ import { NavController } from 'ionic-angular';
 import { Validators, FormBuilder, FormGroup } from '@angular/forms';
 import moment from 'moment';
 import { ScanStorage } from '../../providers/scan-storage';
+import { BarcodeScanner, BarcodeScannerOptions } from '@ionic-native/barcode-scanner';
 
 @Component({
   selector: 'page-scanner',
@@ -12,9 +13,13 @@ export class ScannerPage {
 
   private scanForm: FormGroup;
 
+  scanData : {};
+  private options : BarcodeScannerOptions;
+
   constructor(  private formBuilder: FormBuilder,
                 public navCtrl: NavController,
-                public scanStorage: ScanStorage
+                public scanStorage: ScanStorage,
+                private barcodeScanner: BarcodeScanner
   ) {
 
     this.scanForm = this.formBuilder.group({
@@ -33,13 +38,37 @@ export class ScannerPage {
     // });
   }
 
-  processScan(){
+  processForm(){
+    this.processScan(this.scanForm.value)
+  }
 
-    var scan = this.scanForm.value;
-    scan.time = moment().format('YYYY-MM-DD HH:mm:ss');
+  processScan( scannedVals ){
 
-    this.scanStorage.addAndSave(scan);
+    scannedVals.time = moment().format('YYYY-MM-DD HH:mm:ss');
 
+    this.scanStorage.addAndSave(scannedVals);
+
+  }
+
+  scan(){
+    
+    this.options = {
+      prompt : "Scan your barcode "
+    }
+    this.barcodeScanner.scan(this.options).then((barcodeData) => {
+      console.log(barcodeData);
+      if( barcodeData.format === 'EAN_13' ){
+        this.processScan({ 
+          'isbn': barcodeData.text,
+          'shop': 'Cancer Research',
+          'condition': ''
+        });
+
+      }
+      this.scanData = barcodeData;
+    }, (err) => {
+      console.log("Error occured : " + err);
+    }); 
   }
 
 }
