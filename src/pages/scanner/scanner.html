@@ -1,0 +1,49 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>Scanner</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+
+  <form [formGroup]="scanForm" (ngSubmit)="processScan()">
+  
+    <ion-item>
+      <ion-label>Shop</ion-label>
+      <ion-select formControlName="shop">
+        <ion-option value="nes">NES</ion-option>
+        <ion-option value="n64">Nintendo64</ion-option>
+        <ion-option value="ps">PlayStation</ion-option>
+        <ion-option value="genesis">Sega Genesis</ion-option>
+        <ion-option value="saturn">Sega Saturn</ion-option>
+        <ion-option value="snes">SNES</ion-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label stacked>ISBN</ion-label>
+      <ion-input type="text" formControlName="isbn"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label stacked>Condition</ion-label>
+      <ion-input type="text" formControlName="condition"></ion-input>
+    </ion-item>
+
+    <button type="submit" ion-button block [disabled]="!scanForm.valid">Submit</button>
+
+  </form>
+  
+  <br><hr><br>
+
+  <ion-title>Scans</ion-title>
+  <ion-list>
+    <ion-item *ngFor="let scan of scanStorage.scans">
+      {{ scan.shop }}: 
+      {{ scan.isbn }} : 
+      {{ scan.martin }} 
+      ( {{ scan.condition }} )
+    </ion-item>
+  </ion-list>
+
+</ion-content>

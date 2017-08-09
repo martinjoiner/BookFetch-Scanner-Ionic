@@ -1,0 +1,23 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>Home</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+  <h2>BookFetch Scanner</h2>
+  <p>
+    This app is in beta, meaning is has not been fully tested and we cannot guarantee everything will work. Please let us know if anything doesn't work.
+  </p>
+
+  <button ion-button block (click)="openMenu()">
+    Show Action Sheet
+  </button>
+
+  <ion-list>
+    <ion-item *ngFor="let p of horses">
+      {{p.name}}
+    </ion-item>
+  </ion-list>
+
+</ion-content>
