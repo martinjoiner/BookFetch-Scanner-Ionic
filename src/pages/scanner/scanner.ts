@@ -4,6 +4,7 @@ import { Validators, FormBuilder, FormGroup } from '@angular/forms';
 import moment from 'moment';
 import { ScanStorage } from '../../providers/scan-storage';
 import { BarcodeScanner, BarcodeScannerOptions } from '@ionic-native/barcode-scanner';
+import { RestProvider } from '../../providers/rest/rest';
 
 @Component({
   selector: 'page-scanner',
@@ -16,10 +17,16 @@ export class ScannerPage {
   scanData : {};
   private options : BarcodeScannerOptions;
 
+  countries: string[];
+  errorMessage: string;
+
+  accessToken : string = 'No access token';
+
   constructor(  private formBuilder: FormBuilder,
                 public navCtrl: NavController,
                 public scanStorage: ScanStorage,
-                private barcodeScanner: BarcodeScanner
+                private barcodeScanner: BarcodeScanner,
+                public rest: RestProvider
   ) {
 
     this.scanForm = this.formBuilder.group({
@@ -70,5 +77,37 @@ export class ScannerPage {
       console.log("Error occured : " + err);
     }); 
   }
+
+  ionViewDidLoad() {
+    this.getCountries();
+    this.getAccessToken();
+  }
+
+  getCountries() {
+    this.rest.getCountries()
+       .subscribe(
+         countries => this.countries = countries,
+         error =>  this.errorMessage = <any>error);
+  }
+
+  getAccessToken() {
+    this.rest.getAccessToken( 'fdjskl', '', 'BookFetch Scanner', 'flug9' )
+      .subscribe(
+        res => {
+          console.log(res);
+        }
+        //accessToken => this.accessToken = accessToken
+      );
+  }
+
+  // post(){
+  //   this.http.post("https://httpbin.org/post", "firstname=Nic")
+  //   .subscribe(data => {
+  //       this.postMessage = data.json().data;
+
+  //     }, error => {
+  //       console.log(JSON.stringify(error.json()));
+  //   });
+  // }
 
 }

@@ -17,6 +17,9 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 
+import { HttpModule } from '@angular/http';
+import { RestProvider } from '../providers/rest/rest';
+
 @NgModule({
   declarations: [
     MyApp,
@@ -30,6 +33,7 @@ import { BarcodeScanner } from '@ionic-native/barcode-scanner';
     BrowserModule,
     IonicModule.forRoot(MyApp),
     IonicStorageModule.forRoot(),
+    HttpModule,
   ],
   bootstrap: [IonicApp],
   entryComponents: [
@@ -46,6 +50,7 @@ import { BarcodeScanner } from '@ionic-native/barcode-scanner';
     {provide: ErrorHandler, useClass: IonicErrorHandler},
     ScanStorage,
     BarcodeScanner,
+    RestProvider,
   ]
 })
 export class AppModule {}

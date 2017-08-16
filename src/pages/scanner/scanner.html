@@ -41,6 +41,19 @@
     <p>Scanned Text : {{ scanData.text }}</p>
     <p>Scanned Format : {{ scanData.format }}</p>
   </div>
+
+  <button ion-button (click)="post()">Post...</button>
+  <p>Access Token: {{ accessToken }}</p>
+
+  <ion-list>
+    <ion-item *ngFor="let c of countries">
+      <ion-avatar item-left>
+        <img src="{{c.flag}}">
+      </ion-avatar>
+      <h2>{{c.name}}</h2>
+      <p>Capital: {{c.capital}}, Region: {{c.region}}</p>
+    </ion-item>
+  </ion-list>
   
   <br><hr><br>
 
