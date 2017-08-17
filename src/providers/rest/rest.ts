@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Http, Headers, Response } from '@angular/http';
+import { Http, Headers, Response, RequestOptions } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/catch';
+import 'rxjs/add/observable/throw';
 
 /*
   Generated class for the RestProvider provider.
@@ -14,10 +15,9 @@ import 'rxjs/add/operator/map';
 export class RestProvider {
 
   private apiUrl = 'https://restcountries.eu/rest/v2/all';
+  private bookFetchUrl = 'http://loc.bookfetch.co.uk/';
 
-  constructor(public http: Http) {
-    console.log('Hello RestProvider Provider');
-  }
+  constructor(public http: Http) { }
 
   getCountries(): Observable<string[]> {
     return this.http.get(this.apiUrl)
@@ -27,6 +27,7 @@ export class RestProvider {
 
   private extractData(res: Response) {
     let body = res.json();
+    console.log(body);
     return body || { };
   }
 
@@ -46,28 +47,27 @@ export class RestProvider {
   getAccessToken( client_id: string, 
                   client_secret: string, 
                   username: string, 
-                  password: string){
+                  password: string): Observable<any>{
 
-    let headers = new Headers();
+    let headers = new Headers({'Content-Type': 'application/x-www-form-urlencoded',
+                                'User-Agent': 'BookFetch Scanner App v1.0'
+                              });
 
-    headers.append('Content-Type', 'application/x-www-form-urlencoded');
-    //headers.append('User-Agent', 'BookFetch Scanner App v1.0');
+    let options = new RequestOptions({headers: headers});
     
-    let url = 'http://bookfetch.co.uk/oauth/token';
+    let url = this.bookFetchUrl + 'oauth/token';  
 
     // Construct the data 
-    let data = {
-      'grant_type': 'password',
-      'client_id': client_id,
-      'client_secret': client_secret,
-      'username': username,
-      'password': password,
-      'scope': ''
-    };
+    let body = 'grant_type=password' +
+      '&client_id=' + client_id +
+      '&client_secret=' + client_secret +
+      '&username=' + username +
+      '&password=' + password +
+      '&scope=' + '';
     
-    return this.http.post( url, JSON.stringify(data), {headers: headers} )
-                  .map(this.extractData);
-                  //.catch(this.handleError);
+    return this.http.post( url, body, options )
+                  .map(this.extractData)
+                  .catch(this.handleError);
 
   }
 

@@ -20,7 +20,7 @@ export class ScannerPage {
   countries: string[];
   errorMessage: string;
 
-  accessToken : string = 'No access token';
+  access_token : string = 'No access token';
 
   constructor(  private formBuilder: FormBuilder,
                 public navCtrl: NavController,
@@ -91,13 +91,9 @@ export class ScannerPage {
   }
 
   getAccessToken() {
-    this.rest.getAccessToken( 'fdjskl', '', 'BookFetch Scanner', 'flug9' )
+    this.rest.getAccessToken( '1', '8MaTJ1kOd8rjtPrY6RTUN0IxxTbp7Fz91R9xLzwx', 'scanner@bookfetch.co.uk', 'secret' )
       .subscribe(
-        res => {
-          console.log(res);
-        }
-        //accessToken => this.accessToken = accessToken
-      );
+        res => this.access_token = res.access_token);
   }
 
   // post(){
