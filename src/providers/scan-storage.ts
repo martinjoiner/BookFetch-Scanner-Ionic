@@ -32,18 +32,14 @@ export class ScanStorage {
    */
   normaliseScan ( vals ) {
     // If it hasn't got which shop it was recorded in, it's useless to us
-    if( typeof vals.shop === 'undefined' ){
+    if( typeof vals.shop === 'undefined' && typeof vals.shop_code === 'undefined' ){
       return null;
+    }
+    if( typeof vals.shop_code === 'undefined' ){
+      vals.shop_code = vals.shop;
     }
     if( typeof vals.time === 'undefined' ){
       vals.time = '2017-05-03 21:21:00';
-    }
-    // In version 2 of the app martin was called george
-    if( typeof vals.george === 'string' ){
-      vals.martin = vals.george;
-    }
-    if( typeof vals.martin === 'undefined' ){
-      vals.martin = 1;
     }
     this.scans.push( vals );
   }
@@ -52,6 +48,7 @@ export class ScanStorage {
    * For adding a properly structured Scan object to the array
    */
   addAndSave ( vals: Scan ) {
+    
     this.scans.push( vals );
     this.save();
   }
@@ -59,6 +56,27 @@ export class ScanStorage {
   save () {
     // Save to storage
     this.storage.set(this.storageKey, JSON.stringify(this.scans) );
+  }
+
+  /**
+   * Returns a scan
+   */
+  getAScan () {
+    return this.scans[0];
+  }
+
+  deleteScan ( time: string,
+               shop_code: string, 
+               isbn: string ){
+    // Iterate over the scans array,
+    for( let i = 0, iLimit = this.scans.length; i < iLimit; i++ ){
+      // Delete scans with matching time, shop_code and isbn
+      if( this.scans[i].time == time && this.scans[i].shop_code == shop_code && this.scans[i].isbn == isbn ){
+        this.scans.splice(i, 1);
+        break;
+      }
+    }
+    this.save();
   }
 
 }

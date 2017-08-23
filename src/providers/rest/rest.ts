@@ -44,16 +44,26 @@ export class RestProvider {
     return Observable.throw(errMsg);
   }
 
+  private buildRequestOptions( access_token?: string ){
+    let headerData = {'Content-Type': 'application/x-www-form-urlencoded',
+                                //'User-Agent': 'BookFetch Scanner App v1.0'
+                              };
+
+    if( access_token ){
+      headerData['Authorization'] = 'Bearer ' + access_token;
+    }
+
+    let headers = new Headers(headerData);
+
+    return new RequestOptions({headers: headers});
+  }
+
   getAccessToken( client_id: string, 
                   client_secret: string, 
                   username: string, 
                   password: string): Observable<any>{
 
-    let headers = new Headers({'Content-Type': 'application/x-www-form-urlencoded',
-                                'User-Agent': 'BookFetch Scanner App v1.0'
-                              });
-
-    let options = new RequestOptions({headers: headers});
+    let options = this.buildRequestOptions();
     
     let url = this.bookFetchUrl + 'oauth/token';  
 
@@ -68,6 +78,21 @@ export class RestProvider {
     return this.http.post( url, body, options )
                   .map(this.extractData)
                   .catch(this.handleError);
+
+  }
+
+  postScan( access_token:string, 
+            shop_code: string, 
+            isbn: string ){
+
+    let options = this.buildRequestOptions(access_token);
+
+    let url = this.bookFetchUrl + 'api/scan';
+
+    let body = 'isbn=' + isbn + 
+      '&shop_code=' + shop_code;
+
+    return this.http.post(url, body, options );
 
   }
 

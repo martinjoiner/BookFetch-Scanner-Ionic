@@ -1,7 +1,8 @@
 
 export class Scan {
-  public shop: string;
+  public shop_code: string;
   public isbn: string;
   public condition: string;
   public time: string;
+
 }

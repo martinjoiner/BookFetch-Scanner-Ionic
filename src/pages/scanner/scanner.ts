@@ -30,7 +30,7 @@ export class ScannerPage {
   ) {
 
     this.scanForm = this.formBuilder.group({
-      shop: ['nes', Validators.required],
+      shop_code: ['TENBS3', Validators.required],
       isbn: ['', Validators.required],
       condition: [''],
     });
@@ -79,7 +79,7 @@ export class ScannerPage {
   }
 
   ionViewDidLoad() {
-    this.getCountries();
+    //this.getCountries();
     this.getAccessToken();
   }
 
@@ -96,14 +96,24 @@ export class ScannerPage {
         res => this.access_token = res.access_token);
   }
 
-  // post(){
-  //   this.http.post("https://httpbin.org/post", "firstname=Nic")
-  //   .subscribe(data => {
-  //       this.postMessage = data.json().data;
+  post() {
 
-  //     }, error => {
-  //       console.log(JSON.stringify(error.json()));
-  //   });
-  // }
+    let scan = this.scanStorage.getAScan();
+
+    this.rest.postScan( this.access_token, scan.shop_code, scan.isbn )
+      .subscribe( res => { 
+        console.log(res);
+        if( res.status === 201 ){
+          // Successfully created on bookfetch server, delete from here
+          this.scanStorage.deleteScan( scan.time, scan.shop_code, scan.isbn );
+        } 
+
+      }, res => {
+        if ( res.status === 422 ){
+          console.warn('Deleting unprocessable entity');
+          this.scanStorage.deleteScan( scan.time, scan.shop_code, scan.isbn );
+        }
+    });
+  }
 
 }
