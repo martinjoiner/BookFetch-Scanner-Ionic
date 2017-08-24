@@ -10,7 +10,8 @@ import { Scan } from '../model/scan';
 @Injectable()
 export class ScanStorage {
 
-  private storageKey: string = 'scans';
+  private readonly storageKey: string = 'scans';
+
   public scans: Scan[] = [];
 
   constructor( private storage: Storage ) { 
@@ -31,16 +32,9 @@ export class ScanStorage {
    * previous version of the app, and adds/converts the things needed.
    */
   normaliseScan ( vals ) {
-    // If it hasn't got which shop it was recorded in, it's useless to us
-    if( typeof vals.shop === 'undefined' && typeof vals.shop_code === 'undefined' ){
-      return null;
-    }
-    if( typeof vals.shop_code === 'undefined' ){
-      vals.shop_code = vals.shop;
-    }
-    if( typeof vals.time === 'undefined' ){
-      vals.time = '2017-05-03 21:21:00';
-    }
+
+    // Use this function to add/rename fields that may be absent in stored data from previous versions
+
     this.scans.push( vals );
   }
 
@@ -53,30 +47,38 @@ export class ScanStorage {
     this.save();
   }
 
+  /**
+   * Save the Scan queue to storage
+   */
   save () {
-    // Save to storage
     this.storage.set(this.storageKey, JSON.stringify(this.scans) );
   }
 
   /**
-   * Returns a scan
+   * Returns a scan from the queue
    */
-  getAScan () {
-    return this.scans[0];
+  getAScan () : Scan {
+    if( this.scans.length > 0 ){
+      return this.scans[0];
+    }
+    return null;
   }
 
   deleteScan ( time: string,
                shop_code: string, 
-               isbn: string ){
+               isbn: string ) : boolean {
+    let deleted = false;
     // Iterate over the scans array,
     for( let i = 0, iLimit = this.scans.length; i < iLimit; i++ ){
       // Delete scans with matching time, shop_code and isbn
       if( this.scans[i].time == time && this.scans[i].shop_code == shop_code && this.scans[i].isbn == isbn ){
         this.scans.splice(i, 1);
+        deleted = true;
         break;
       }
     }
     this.save();
+    return deleted;
   }
 
 }

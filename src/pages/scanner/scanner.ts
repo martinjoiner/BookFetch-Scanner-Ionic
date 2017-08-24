@@ -1,10 +1,12 @@
 import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
 import { Validators, FormBuilder, FormGroup } from '@angular/forms';
+import { ActionSheetController } from 'ionic-angular';
 import moment from 'moment';
 import { ScanStorage } from '../../providers/scan-storage';
 import { BarcodeScanner, BarcodeScannerOptions } from '@ionic-native/barcode-scanner';
 import { RestProvider } from '../../providers/rest/rest';
+import { Scan } from '../../model/scan';
 
 @Component({
   selector: 'page-scanner',
@@ -17,32 +19,19 @@ export class ScannerPage {
   scanData : {};
   private options : BarcodeScannerOptions;
 
-  countries: string[];
-  errorMessage: string;
-
-  access_token : string = 'No access token';
-
   constructor(  private formBuilder: FormBuilder,
                 public navCtrl: NavController,
+                public actionSheetCtrl: ActionSheetController,
                 public scanStorage: ScanStorage,
                 private barcodeScanner: BarcodeScanner,
-                public rest: RestProvider
+                public rest: RestProvider,
   ) {
 
     this.scanForm = this.formBuilder.group({
       shop_code: ['TENBS3', Validators.required],
       isbn: ['', Validators.required],
-      condition: [''],
     });
 
-    // this.scanStorage.normaliseScan({ 'sausage': 'fish' });
-
-    // this.scanStorage.normaliseScan({ 
-    //   'shop': 'Saaaffille Init',
-    //   'isbn': '939393',
-    //   'condition': '',
-    //   'time': '2017-08-07 06:33:43'
-    // });
   }
 
   processForm(){
@@ -57,6 +46,7 @@ export class ScannerPage {
 
   }
 
+
   scan(){
     
     this.options = {
@@ -67,8 +57,7 @@ export class ScannerPage {
       if( barcodeData.format === 'EAN_13' ){
         this.processScan({ 
           'isbn': barcodeData.text,
-          'shop': 'Cancer Research',
-          'condition': ''
+          'shop_code': this.scanForm.value.shop_code,
         });
 
       }
@@ -78,29 +67,18 @@ export class ScannerPage {
     }); 
   }
 
-  ionViewDidLoad() {
-    //this.getCountries();
-    this.getAccessToken();
-  }
 
-  getCountries() {
-    this.rest.getCountries()
-       .subscribe(
-         countries => this.countries = countries,
-         error =>  this.errorMessage = <any>error);
-  }
+  post( scan?: Scan ) {
 
-  getAccessToken() {
-    this.rest.getAccessToken( '1', '8MaTJ1kOd8rjtPrY6RTUN0IxxTbp7Fz91R9xLzwx', 'scanner@bookfetch.co.uk', 'secret' )
-      .subscribe(
-        res => this.access_token = res.access_token);
-  }
+    if( !scan ){
+      scan = this.scanStorage.getAScan();
+    }
 
-  post() {
+    if( scan == null ){
+      return false;
+    }
 
-    let scan = this.scanStorage.getAScan();
-
-    this.rest.postScan( this.access_token, scan.shop_code, scan.isbn )
+    this.rest.postScan( scan.shop_code, scan.isbn )
       .subscribe( res => { 
         console.log(res);
         if( res.status === 201 ){
@@ -114,6 +92,29 @@ export class ScannerPage {
           this.scanStorage.deleteScan( scan.time, scan.shop_code, scan.isbn );
         }
     });
+  }
+
+
+  openScanMenu( scan: Scan ) {
+    let actionSheet = this.actionSheetCtrl.create({
+      title: 'Do what?',
+      buttons: [
+        {
+          text: 'Try post to BookFetch.co.uk',
+          role: 'destructive',
+          handler: () => {
+            this.post( scan );
+          }
+        },{
+          text: 'Cancel',
+          role: 'cancel',
+          handler: () => {
+            console.log('Cancel clicked');
+          }
+        }
+      ]
+    });
+    actionSheet.present();
   }
 
 }

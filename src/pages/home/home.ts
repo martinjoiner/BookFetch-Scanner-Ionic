@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
-import { ActionSheetController } from 'ionic-angular';
+import { Validators, FormBuilder, FormGroup } from '@angular/forms';
 import { AlertController } from 'ionic-angular';
+import { RestProvider } from '../../providers/rest/rest';
 
 @Component({
   selector: 'page-home',
@@ -9,49 +10,48 @@ import { AlertController } from 'ionic-angular';
 })
 export class HomePage {
 
-  horses: Array<object> = [];
+  const 
 
-  constructor(  public navCtrl: NavController, 
-                public actionSheetCtrl: ActionSheetController,
-                public alertCtrl: AlertController 
+  private loginForm: FormGroup;
+
+  public login_failed: boolean = false;
+
+  constructor(  private formBuilder: FormBuilder,
+                public navCtrl: NavController, 
+                public alertCtrl: AlertController,
+                public rest: RestProvider, 
   ) {
-    
-    this.horses = [ 
-      { name: 'Lightning' }, 
-      { name: 'Nelly' },
-      { name: 'Donkey' },
-    ];
+
+    this.loginForm = this.formBuilder.group({
+      username: ['scanner@bookfetch.co.uk', Validators.required],
+      password: ['', Validators.required],
+    });
     
   }
 
-  openMenu() {
-    let actionSheet = this.actionSheetCtrl.create({
-      title: 'Modify your album',
-      buttons: [
-        {
-          text: 'Add Horse',
-          role: 'destructive',
-          handler: () => {
-            console.log('Destructive clicked');
-            this.horses.push( { name: 'Redrum' } );
-          }
-        },{
-          text: 'Destoy Horse',
-          handler: () => {
-            console.log('Archive clicked');
-            var pointer = Math.floor( Math.random() * this.horses.length);
-            this.horses.splice( pointer, 1 );
-          }
-        },{
-          text: 'Cancel',
-          role: 'cancel',
-          handler: () => {
-            console.log('Cancel clicked');
-          }
+  processLoginForm() {
+    this.login_failed = false;
+    this.getAccessToken( this.loginForm.value.username, this.loginForm.value.password );
+  }
+
+  getAccessToken( username: string, 
+                  password: string ) {
+    this.rest.getAccessToken( username, password )
+      .subscribe(
+        res => { 
+          this.rest.setAccessToken(res.json().access_token); 
+          console.log(res); 
+        },
+        res => {
+          if( res.status == 401 ){
+            this.login_failed = true;
+          } 
         }
-      ]
-    });
-    actionSheet.present();
+      );
+  }
+
+  discardToken() {
+    this.rest.discardAccessToken();
   }
 
 }

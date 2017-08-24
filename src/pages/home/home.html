@@ -5,19 +5,33 @@
 </ion-header>
 
 <ion-content padding>
+
   <h2>BookFetch Scanner</h2>
+
   <p>
     This app is in beta, meaning is has not been fully tested and we cannot guarantee everything will work. Please let us know if anything doesn't work.
   </p>
-
-  <button ion-button block (click)="openMenu()">
-    Show Action Sheet
-  </button>
-
-  <ion-list>
-    <ion-item *ngFor="let p of horses">
-      {{p.name}}
+  
+  <div *ngIf="rest.access_token">
+    <h2>You are logged in</h2>
+    You are logged in with access token {{ rest.access_token | slice:0:12 }}... <button ion-button (click)="discardToken()">Discard token</button>
+  </div>
+  <form *ngIf="!rest.access_token" [formGroup]="loginForm" (ngSubmit)="processLoginForm()">
+  
+    <ion-item>
+      <ion-label stacked>Username</ion-label>
+      <ion-input type="text" formControlName="username"></ion-input>
     </ion-item>
-  </ion-list>
+
+    <ion-item>
+      <ion-label stacked>Password</ion-label>
+      <ion-input type="password" formControlName="password"></ion-input>
+    </ion-item>
+
+    <p *ngIf="login_failed">Login failed</p>
+
+    <button type="submit" ion-button block [disabled]="!loginForm.valid">Login</button>
+
+  </form>
 
 </ion-content>

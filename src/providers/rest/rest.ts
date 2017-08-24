@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Storage } from '@ionic/storage';
 import { Http, Headers, Response, RequestOptions } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
@@ -14,15 +15,21 @@ import 'rxjs/add/observable/throw';
 @Injectable()
 export class RestProvider {
 
-  private apiUrl = 'https://restcountries.eu/rest/v2/all';
-  private bookFetchUrl = 'http://loc.bookfetch.co.uk/';
+  private readonly client_id : string = '1'; 
+  private readonly client_secret : string = '8MaTJ1kOd8rjtPrY6RTUN0IxxTbp7Fz91R9xLzwx'; 
 
-  constructor(public http: Http) { }
+  private readonly storageKey: string = 'access_token';
 
-  getCountries(): Observable<string[]> {
-    return this.http.get(this.apiUrl)
-                  .map(this.extractData)
-                  .catch(this.handleError);
+  private readonly bookFetchUrl = 'http://bookfetch.co.uk/';
+  
+  public access_token: string;
+
+  constructor(  public http: Http,
+                private storage: Storage ) {
+    // Pull access_token from storage
+    this.storage.get(this.storageKey).then( access_token => {
+      this.access_token = access_token
+    });
   }
 
   private extractData(res: Response) {
@@ -31,7 +38,7 @@ export class RestProvider {
     return body || { };
   }
 
-  private handleError (error: Response | any) {
+  private handleError(error: Response | any) {
     let errMsg: string;
     if (error instanceof Response) {
       const body = error.json() || '';
@@ -58,9 +65,7 @@ export class RestProvider {
     return new RequestOptions({headers: headers});
   }
 
-  getAccessToken( client_id: string, 
-                  client_secret: string, 
-                  username: string, 
+  getAccessToken( username: string, 
                   password: string): Observable<any>{
 
     let options = this.buildRequestOptions();
@@ -69,23 +74,19 @@ export class RestProvider {
 
     // Construct the data 
     let body = 'grant_type=password' +
-      '&client_id=' + client_id +
-      '&client_secret=' + client_secret +
+      '&client_id=' + this.client_id +
+      '&client_secret=' + this.client_secret +
       '&username=' + username +
       '&password=' + password +
       '&scope=' + '';
     
-    return this.http.post( url, body, options )
-                  .map(this.extractData)
-                  .catch(this.handleError);
-
+    return this.http.post( url, body, options );
   }
 
-  postScan( access_token:string, 
-            shop_code: string, 
+  postScan( shop_code: string, 
             isbn: string ){
 
-    let options = this.buildRequestOptions(access_token);
+    let options = this.buildRequestOptions(this.access_token);
 
     let url = this.bookFetchUrl + 'api/scan';
 
@@ -94,6 +95,23 @@ export class RestProvider {
 
     return this.http.post(url, body, options );
 
+  }
+
+  setAccessToken( newToken: string ) {
+    this.access_token = newToken;
+    this.save();
+  }
+
+  discardAccessToken() {
+    this.access_token = null;
+    this.save();
+  }
+
+  /**
+   * Save the Scan queue to storage
+   */
+  save() {
+    this.storage.set(this.storageKey, this.access_token );
   }
 
 }

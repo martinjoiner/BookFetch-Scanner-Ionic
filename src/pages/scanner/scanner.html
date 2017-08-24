@@ -1,6 +1,6 @@
 <ion-header>
   <ion-navbar>
-    <ion-title>Scanner</ion-title>
+    <ion-title>Scan Stock</ion-title>
   </ion-navbar>
 </ion-header>
 
@@ -22,25 +22,19 @@
       <ion-input type="text" formControlName="isbn"></ion-input>
     </ion-item>
 
-    <ion-item>
-      <ion-label stacked>Condition</ion-label>
-      <ion-input type="text" formControlName="condition"></ion-input>
-    </ion-item>
-
     <button type="submit" ion-button block [disabled]="!scanForm.valid">Submit</button>
 
   </form>
 
   <br><hr><br>
 
-  <button ion-button (click)="scan()">Scan ... </button>
+  <button ion-button (click)="scan()">Scan ...</button>
   <div *ngIf="scanData">
     <p>Scanned Text : {{ scanData.text }}</p>
     <p>Scanned Format : {{ scanData.format }}</p>
   </div>
 
-  <button ion-button (click)="post()">Post...</button>
-  <p>Access Token: {{ access_token }}</p>
+  <p>Access Token: {{ rest.access_token | slice:0:12 }}</p>
 
   <ion-list>
     <ion-item *ngFor="let c of countries">
@@ -55,12 +49,10 @@
   <br><hr><br>
 
   <ion-title>Scans</ion-title>
+  <button ion-button (click)="post()" [disabled]="!scanStorage.scans.length">Post...</button>
   <ion-list>
-    <ion-item *ngFor="let scan of scanStorage.scans">
-      {{ scan.shop }}: 
-      {{ scan.isbn }} : 
-      {{ scan.martin }} 
-      ( {{ scan.condition }} )
+    <ion-item *ngFor="let scan of scanStorage.scans" (click)="openScanMenu(scan)">
+      {{ scan.isbn }} in {{ scan.shop_code }}
     </ion-item>
   </ion-list>
 
