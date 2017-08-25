@@ -3,7 +3,7 @@ import { NavController } from 'ionic-angular';
 import { Validators, FormBuilder, FormGroup } from '@angular/forms';
 import { ActionSheetController } from 'ionic-angular';
 import moment from 'moment';
-import { ScanStorage } from '../../providers/scan-storage';
+import { ScansProvider } from '../../providers/scans/scans';
 import { BarcodeScanner, BarcodeScannerOptions } from '@ionic-native/barcode-scanner';
 import { RestProvider } from '../../providers/rest/rest';
 import { ShopsProvider } from '../../providers/shops/shops';
@@ -23,7 +23,7 @@ export class ScannerPage {
   constructor(  private formBuilder: FormBuilder,
                 public navCtrl: NavController,
                 public actionSheetCtrl: ActionSheetController,
-                public scanStorage: ScanStorage,
+                public scans: ScansProvider,
                 private barcodeScanner: BarcodeScanner,
                 public rest: RestProvider,
                 public shops: ShopsProvider,
@@ -48,7 +48,7 @@ export class ScannerPage {
 
     scannedVals.time = moment().format('YYYY-MM-DD HH:mm:ss');
 
-    this.scanStorage.addAndSave(scannedVals);
+    this.scans.addAndSave(scannedVals);
 
   }
 
@@ -77,7 +77,7 @@ export class ScannerPage {
   post( scan?: Scan ) {
 
     if( !scan ){
-      scan = this.scanStorage.getAScan();
+      scan = this.scans.getAScan();
     }
 
     if( scan == null ){
@@ -89,13 +89,13 @@ export class ScannerPage {
         console.log(res);
         if( res.status === 201 ){
           // Successfully created on bookfetch server, delete from here
-          this.scanStorage.deleteScan( scan.time, scan.shop_code, scan.isbn );
+          this.scans.deleteScan( scan.time, scan.shop_code, scan.isbn );
         } 
 
       }, res => {
         if ( res.status === 422 ){
           console.warn('Deleting unprocessable entity');
-          this.scanStorage.deleteScan( scan.time, scan.shop_code, scan.isbn );
+          this.scans.deleteScan( scan.time, scan.shop_code, scan.isbn );
         }
     });
   }

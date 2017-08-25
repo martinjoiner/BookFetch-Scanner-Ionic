@@ -7,7 +7,7 @@
 <ion-content padding>
 
   <button ion-button (click)="refreshShops()">Refresh Shops</button>
-  
+
   <form [formGroup]="scanForm" (ngSubmit)="processForm()">  
 
     <ion-item>
@@ -49,9 +49,9 @@
   <br><hr><br>
 
   <ion-title>Scans</ion-title>
-  <button ion-button (click)="post()" [disabled]="!scanStorage.scans.length">Post...</button>
+  <button ion-button (click)="post()" [disabled]="!scans.scans.length">Post...</button>
   <ion-list>
-    <ion-item *ngFor="let scan of scanStorage.scans" (click)="openScanMenu(scan)">
+    <ion-item *ngFor="let scan of scans.scans" (click)="openScanMenu(scan)">
       {{ scan.isbn }} in {{ scan.shop_code }}
     </ion-item>
   </ion-list>

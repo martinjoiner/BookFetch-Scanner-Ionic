@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Storage } from '@ionic/storage';
-import { Scan } from '../model/scan';
+import { Scan } from '../../model/scan';
 
 /**
  * Accepts any old crap (pulled from storage, possibly 
@@ -8,7 +8,7 @@ import { Scan } from '../model/scan';
  * either returns a valid instance of Scan of null
  */
 @Injectable()
-export class ScanStorage {
+export class ScansProvider {
 
   private readonly storageKey: string = 'scans';
 
