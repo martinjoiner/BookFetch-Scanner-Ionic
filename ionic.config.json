@@ -1,8 +1,9 @@
 {
   "name": "BookFetch Scanner",
-  "app_id": "",
+  "app_id": "bec449e8",
   "type": "ionic-angular",
   "integrations": {
     "cordova": {}
-  }
+  },
+  "backend": "pro"
 }
