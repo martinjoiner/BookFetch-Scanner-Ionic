@@ -51,10 +51,11 @@ export class RestProvider {
     return Observable.throw(errMsg);
   }
 
-  private buildRequestOptions( access_token?: string ){
-    let headerData = {'Content-Type': 'application/x-www-form-urlencoded',
-                                //'User-Agent': 'BookFetch Scanner App v1.0'
-                              };
+  private buildRequestOptions( access_token?: string,
+                                contentType: string = 'application/x-www-form-urlencoded' ) : RequestOptions {
+    let headerData = {  'Content-Type': contentType
+                        //'User-Agent': 'BookFetch Scanner App v1.0'
+                      };
 
     if( access_token ){
       headerData['Authorization'] = 'Bearer ' + access_token;
@@ -95,6 +96,14 @@ export class RestProvider {
 
     return this.http.post(url, body, options );
 
+  }
+
+  getShops() {
+    let options = this.buildRequestOptions(this.access_token, 'application/json');
+
+    let url = this.bookFetchUrl + 'api/myStockableShops';
+
+    return this.http.get(url, options );
   }
 
   setAccessToken( newToken: string ) {

@@ -6,14 +6,14 @@
 
 <ion-content padding>
 
-  <form [formGroup]="scanForm" (ngSubmit)="processForm()">
+  <button ion-button (click)="refreshShops()">Refresh Shops</button>
   
+  <form [formGroup]="scanForm" (ngSubmit)="processForm()">  
+
     <ion-item>
       <ion-label>Shop</ion-label>
       <ion-select formControlName="shop_code">
-        <ion-option value="TENBS3">Tenovus BS3</ion-option>
-        <ion-option value="CHSWBS3">Childrens Hospice SW</ion-option>
-        <ion-option value="STPHBS3">St Peters Hospice North Street</ion-option>
+        <ion-option *ngFor="let shop of shops.shops" value="{{ shop.code }}">{{ shop.name }}</ion-option>
       </ion-select>
     </ion-item>
 

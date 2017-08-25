@@ -19,6 +19,7 @@ import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 
 import { HttpModule } from '@angular/http';
 import { RestProvider } from '../providers/rest/rest';
+import { ShopsProvider } from '../providers/shops/shops';
 
 @NgModule({
   declarations: [
@@ -51,6 +52,7 @@ import { RestProvider } from '../providers/rest/rest';
     ScanStorage,
     BarcodeScanner,
     RestProvider,
+    ShopsProvider,
   ]
 })
 export class AppModule {}

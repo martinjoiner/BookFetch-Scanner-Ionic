@@ -6,6 +6,7 @@ import moment from 'moment';
 import { ScanStorage } from '../../providers/scan-storage';
 import { BarcodeScanner, BarcodeScannerOptions } from '@ionic-native/barcode-scanner';
 import { RestProvider } from '../../providers/rest/rest';
+import { ShopsProvider } from '../../providers/shops/shops';
 import { Scan } from '../../model/scan';
 
 @Component({
@@ -25,6 +26,7 @@ export class ScannerPage {
                 public scanStorage: ScanStorage,
                 private barcodeScanner: BarcodeScanner,
                 public rest: RestProvider,
+                public shops: ShopsProvider,
   ) {
 
     this.scanForm = this.formBuilder.group({
@@ -32,6 +34,10 @@ export class ScannerPage {
       isbn: ['', Validators.required],
     });
 
+  }
+
+  refreshShops() {
+    this.shops.refresh();
   }
 
   processForm(){
